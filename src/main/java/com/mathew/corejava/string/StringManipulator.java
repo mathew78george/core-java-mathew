@@ -66,6 +66,7 @@ public class StringManipulator {
 	}
 
 	public static void main(String[] args) {
+		System.out.println(1 << 30);
 		StringManipulator stutil = new StringManipulator();
 		Set<StringWrapper> wrappedWords = new TreeSet<StringWrapper>();
 		try {
