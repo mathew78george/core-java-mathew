@@ -33,7 +33,18 @@ public class MyMapDSImplementation<K, V> implements Map<K, V> {
 
 	@Override
 	public boolean containsValue(Object value) {
-		// TODO Auto-generated method stub
+		if (count == 0) {
+			return false;
+		}
+		for (Node<K, V> entry : table) {
+			Node<K, V> aNode = entry;
+			while (aNode != null) {
+				if (aNode.value == value) {
+					return true;
+				}
+				aNode = entry.next;
+			}
+		}
 		return false;
 	}
 
@@ -67,8 +78,7 @@ public class MyMapDSImplementation<K, V> implements Map<K, V> {
 			count++;
 			return value;
 		}
-		Node<K, V> aNode = existingNode;
-		count++;
+		Node<K, V> aNode = existingNode;		
 		while (aNode != null) {
 			if (hash == aNode.hash && key.equals(aNode.key)) {
 				aNode.value = value;
@@ -78,6 +88,7 @@ public class MyMapDSImplementation<K, V> implements Map<K, V> {
 		}
 		Node<K, V> newNode = new Node<K, V>(hash, key, value, existingNode);
 		table[index] = newNode;
+		count++;
 		return value;
 	}
 
@@ -136,6 +147,7 @@ public class MyMapDSImplementation<K, V> implements Map<K, V> {
 		} else {
 			table[index] = head.next;
 		}
+		count--;
 		return head.value;
 	}
 
@@ -147,8 +159,10 @@ public class MyMapDSImplementation<K, V> implements Map<K, V> {
 
 	@Override
 	public void clear() {
-		// TODO Auto-generated method stub
-
+		for (int ii = 0; ii < BUCKET_SIZE; ii++) {
+			table[ii] = null;
+		}
+		count = 0;
 	}
 
 	@Override
@@ -172,8 +186,41 @@ public class MyMapDSImplementation<K, V> implements Map<K, V> {
 
 	@Override
 	public Set<Entry<K, V>> entrySet() {
-		// TODO Auto-generated method stub
+
 		return null;
+	}
+
+	public Iterator<Node<K, V>> entrySetIter() {
+		return new EntrySetIter();
+	}
+
+	class EntrySetIter implements Iterator<Node<K, V>> {
+		Node<K, V> current;
+		int counter = 0;
+		int currentIndex = 0;
+		public EntrySetIter() {
+			current = table[counter++];
+		}
+
+		@Override
+		public boolean hasNext() {
+			return (currentIndex < count);
+		}
+
+		@Override
+		public Node<K, V> next() {
+			if (current == null && counter < BUCKET_SIZE) {
+				current = table[counter++];
+			}
+			if (current == null) {
+				return null;
+			}
+			Node<K, V> node = current;
+			current = node.next;
+			currentIndex++;
+			return node;
+		}
+
 	}
 
 	static class Node<K, V> {
@@ -188,11 +235,16 @@ public class MyMapDSImplementation<K, V> implements Map<K, V> {
 			hash = h;
 			next = n;
 		}
+
+		@Override
+		public String toString() {
+			return "[key = " + key + " + value =" + value + "]";
+		}
 	}
 
 	public static void main(String[] args) {
 		MyMapDSImplementation<Integer, String> maps = new MyMapDSImplementation<Integer, String>();
-		for (int ii = 0; ii < 30; ii++) {
+		for (int ii = 0; ii < 25; ii++) {
 			maps.put(new Integer(ii), "Value" + ii);
 		}
 		maps.put(new Integer(16), "New Value 16");
@@ -200,10 +252,9 @@ public class MyMapDSImplementation<K, V> implements Map<K, V> {
 		maps.put(new Integer(20), "New Value 20");
 		maps.put(new Integer(21), "New Value 21");
 		maps.put(new Integer(29), "New Value 29");
-		Set<Integer> keys = maps.keySet();
-		Iterator<Integer> iter = keys.iterator();
+		Iterator iter = maps.entrySetIter();
 		while (iter.hasNext()) {
-			System.out.println(maps.get(iter.next()));
+			System.out.println(iter.next());
 		}
 
 	}
