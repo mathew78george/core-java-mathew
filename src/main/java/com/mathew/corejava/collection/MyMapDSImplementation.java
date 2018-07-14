@@ -1,5 +1,12 @@
 package com.mathew.corejava.collection;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -9,11 +16,17 @@ import java.util.Set;
 public class MyMapDSImplementation<K, V> implements Map<K, V> {
 
 	Node<K, V>[] table;
-	static final int BUCKET_SIZE = 6;
+	private int bucketSize;
+	private int threshold;
+	private float loadFactor = 0.75f;
+	// private static final int MAX_ARRAY_SIZE = 64;
+	private static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8;
 	int count = 0;
 
 	public MyMapDSImplementation() {
-		table = new Node[BUCKET_SIZE];
+		bucketSize = 11;
+		table = new Node[bucketSize];
+		threshold = (int) Math.min(bucketSize * loadFactor, MAX_ARRAY_SIZE + 1);
 	}
 
 	@Override
@@ -29,6 +42,25 @@ public class MyMapDSImplementation<K, V> implements Map<K, V> {
 	@Override
 	public boolean containsKey(Object key) {
 		return (get(key) == null);
+	}
+
+	private void reSize() {
+		Node<K, V>[] oldTab = table;
+		int oldBucketSize = oldTab.length;
+		int newBucketSize = oldBucketSize << 1;
+		if (oldBucketSize >= MAX_ARRAY_SIZE || newBucketSize >= MAX_ARRAY_SIZE) {
+			return;
+		}
+		Node<K, V>[] newTab = new Node[newBucketSize];
+		bucketSize = newBucketSize;
+		for (Node<K, V> entry : oldTab) {
+			if (entry != null) {
+				int index = entry.key.hashCode() % newBucketSize;
+				newTab[index] = entry;
+			}
+		}
+		table = newTab;
+		threshold = (int) Math.min(newBucketSize * loadFactor, MAX_ARRAY_SIZE + 1);
 	}
 
 	@Override
@@ -52,7 +84,7 @@ public class MyMapDSImplementation<K, V> implements Map<K, V> {
 	public V get(Object key) {
 		K castedKey = (K) key;
 		int hash = castedKey.hashCode();
-		int index = hash % BUCKET_SIZE;
+		int index = hash % bucketSize;
 		Node<K, V> node = (Node<K, V>) table[index];
 		if (node == null) {
 			return null;
@@ -69,8 +101,11 @@ public class MyMapDSImplementation<K, V> implements Map<K, V> {
 
 	@Override
 	public V put(K key, V value) {
+		if (count >= threshold) {
+			reSize();
+		}
 		int hash = key.hashCode();
-		int index = hash % BUCKET_SIZE;
+		int index = hash % bucketSize;
 		Node<K, V> existingNode = (Node<K, V>) table[index];
 		if (existingNode == null) {
 			Node<K, V> newNode = new Node<K, V>(hash, key, value, null);
@@ -78,7 +113,7 @@ public class MyMapDSImplementation<K, V> implements Map<K, V> {
 			count++;
 			return value;
 		}
-		Node<K, V> aNode = existingNode;		
+		Node<K, V> aNode = existingNode;
 		while (aNode != null) {
 			if (hash == aNode.hash && key.equals(aNode.key)) {
 				aNode.value = value;
@@ -94,7 +129,7 @@ public class MyMapDSImplementation<K, V> implements Map<K, V> {
 
 	public V put1(K key, V value) {
 		int hash = key.hashCode();
-		int index = hash % BUCKET_SIZE;
+		int index = hash % bucketSize;
 		if (count == 0) {
 			System.out.println("Zero");
 			Node<K, V> node = new Node<K, V>(hash, key, value, null);
@@ -124,7 +159,7 @@ public class MyMapDSImplementation<K, V> implements Map<K, V> {
 	@Override
 	public V remove(Object key) {
 		int hash = key.hashCode();
-		int index = hash % BUCKET_SIZE;
+		int index = hash % bucketSize;
 		Node<K, V> head = table[index];
 		if (head == null) {
 			System.out.println("Element not found");
@@ -159,7 +194,7 @@ public class MyMapDSImplementation<K, V> implements Map<K, V> {
 
 	@Override
 	public void clear() {
-		for (int ii = 0; ii < BUCKET_SIZE; ii++) {
+		for (int ii = 0; ii < bucketSize; ii++) {
 			table[ii] = null;
 		}
 		count = 0;
@@ -168,7 +203,7 @@ public class MyMapDSImplementation<K, V> implements Map<K, V> {
 	@Override
 	public Set<K> keySet() {
 		Set<K> keySet = new HashSet<K>();
-		for (int ii = 0; ii < BUCKET_SIZE; ii++) {
+		for (int ii = 0; ii < bucketSize; ii++) {
 			Node<K, V> aNode = (Node<K, V>) table[ii];
 			while (aNode != null) {
 				keySet.add((K) aNode.key);
@@ -198,6 +233,7 @@ public class MyMapDSImplementation<K, V> implements Map<K, V> {
 		Node<K, V> current;
 		int counter = 0;
 		int currentIndex = 0;
+
 		public EntrySetIter() {
 			current = table[counter++];
 		}
@@ -209,10 +245,11 @@ public class MyMapDSImplementation<K, V> implements Map<K, V> {
 
 		@Override
 		public Node<K, V> next() {
-			if (current == null && counter < BUCKET_SIZE) {
+			if (current == null && counter < bucketSize) {
 				current = table[counter++];
 			}
 			if (current == null) {
+				System.out.println("returning null");
 				return null;
 			}
 			Node<K, V> node = current;
@@ -244,18 +281,26 @@ public class MyMapDSImplementation<K, V> implements Map<K, V> {
 
 	public static void main(String[] args) {
 		MyMapDSImplementation<Integer, String> maps = new MyMapDSImplementation<Integer, String>();
-		for (int ii = 0; ii < 25; ii++) {
+		for (int ii = 0; ii < 100; ii++) {
 			maps.put(new Integer(ii), "Value" + ii);
 		}
-		maps.put(new Integer(16), "New Value 16");
-		maps.put(new Integer(15), "New Value 15");
-		maps.put(new Integer(20), "New Value 20");
-		maps.put(new Integer(21), "New Value 21");
-		maps.put(new Integer(29), "New Value 29");
-		Iterator iter = maps.entrySetIter();
-		while (iter.hasNext()) {
-			System.out.println(iter.next());
+		System.out.println("maps bucket size" + maps.table.length);
+		Path pathtoFile = Paths.get("mapoutput.txt");
+		try (BufferedWriter writer = Files.newBufferedWriter(pathtoFile, StandardCharsets.US_ASCII,
+				StandardOpenOption.CREATE)) {
+			Set<Integer> keys = maps.keySet();
+			for (Integer aKey : keys) {
+				String value = (String) maps.get(aKey);
+				writer.write(aKey + "  " + value + "\n");
+			}
+			writer.close();
+		} catch (IOException ioe) {
+
 		}
+		System.out.println(Integer.MAX_VALUE);
+		System.out.println(Long.MAX_VALUE);
+		System.out.println(Float.MAX_VALUE);
+		System.out.println(Double.MAX_VALUE);
 
 	}
 
