@@ -18,5 +18,24 @@ public class MongoDBConnector {
 
     }
   }
+  
+	static int[] solve(int[] a, int[] b) {
+		int scoreA = 0;
+		int scoreB = 0;
+		int arrayLengn = a.length;
+		if (arrayLengn != b.length) {
+			System.out.println("Array Lengnth are not matching");
+			return null;
+		}
+		for (int ii = 0; ii < arrayLengn; ii++) {
+			if (a[ii] > b[ii]) {
+				scoreA++;
+			} else if (b[ii] > a[ii]) {
+				scoreB++;
+			}
+		}
+		return new int[] { scoreA, scoreB };
+	}
+
 
 }
