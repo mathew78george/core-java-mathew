@@ -23,6 +23,7 @@ public class ArrayUtils {
 	public static void main(String[] args) {
 //		miniMaxSum(new int[] { 1, 2, 3, 4, 5, 6, 7, 8 });
 		System.out.println(aVeryBigSum(new long[] { 1000000001, 1000000002, 1000000003, 1000000004, 1000000005 }));
+		System.err.println("sasasasas");
 	}
 
 }
