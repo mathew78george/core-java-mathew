@@ -23,5 +23,4 @@ public class LoggerSystem {
 	public static void logmessage(String message, LogLevel level) {
 		LongDispatcher.getInstance().dispatchLogmessage(message, level);
 	}
-
 }
