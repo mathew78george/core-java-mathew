@@ -13,12 +13,18 @@ public class FileLogger implements LoggerBase {
 
 	BufferedWriter logWriter;
 	ReentrantLock lock;
+	String fileName;
 
-	public FileLogger(String fileName) {
+	public FileLogger(String file) {
+		fileName = file;
+		lock = new ReentrantLock();
+		createFile();		
+	}
+
+	public void createFile() {
 		Path pathTofile = Paths.get(fileName);
 		try {
-			logWriter = Files.newBufferedWriter(pathTofile, StandardCharsets.US_ASCII, StandardOpenOption.CREATE);
-			lock = new ReentrantLock();
+			logWriter = Files.newBufferedWriter(pathTofile, StandardCharsets.US_ASCII, StandardOpenOption.CREATE);			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -31,7 +37,7 @@ public class FileLogger implements LoggerBase {
 			logWriter.write("ERROR:" + error + "\n");
 			logWriter.flush();
 		} catch (IOException ioe) {
-
+			ioe.printStackTrace();
 		} finally {
 			lock.unlock();
 		}
@@ -44,7 +50,7 @@ public class FileLogger implements LoggerBase {
 			logWriter.write("INFO:" + info + "\n");
 			logWriter.flush();
 		} catch (IOException ioe) {
-
+			ioe.printStackTrace();
 		} finally {
 			lock.unlock();
 		}
@@ -56,7 +62,7 @@ public class FileLogger implements LoggerBase {
 			logWriter.write("WARNING:" + warning + "\n");
 			logWriter.flush();
 		} catch (IOException ioe) {
-
+			ioe.printStackTrace();
 		} finally {
 			lock.unlock();
 		}
@@ -68,9 +74,27 @@ public class FileLogger implements LoggerBase {
 			logWriter.write("DEBUG:" + debug + "\n");
 			logWriter.flush();
 		} catch (IOException ioe) {
-
+			ioe.printStackTrace();
 		} finally {
 			lock.unlock();
+		}
+	}
+
+	public void rolloverFile() {
+		Path pathTofile = Paths.get(fileName);
+		long sizeinBytes = pathTofile.toFile().length();
+		long kbs = sizeinBytes / 1024;
+		if (kbs >= 100) {
+			System.out.println("File size reached 100 KB");
+			synchronized (this) {
+				String newfilename = "logfile" + System.currentTimeMillis() / 1000 + ".txt";
+				Path newpathTofile = Paths.get(newfilename);
+				pathTofile.toFile().renameTo(newpathTofile.toFile());
+				pathTofile.toFile().delete();
+				System.out.println("Done rolloverFile ");
+				logWriter = null;
+				createFile();
+			}
 		}
 	}
 
