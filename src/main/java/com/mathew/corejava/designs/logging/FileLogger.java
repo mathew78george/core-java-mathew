@@ -17,7 +17,7 @@ public class FileLogger implements LoggerBase {
 	public FileLogger(String fileName) {
 		Path pathTofile = Paths.get(fileName);
 		try {
-			logWriter = Files.newBufferedWriter(pathTofile, StandardCharsets.US_ASCII, StandardOpenOption.APPEND);
+			logWriter = Files.newBufferedWriter(pathTofile, StandardCharsets.US_ASCII, StandardOpenOption.CREATE);
 			lock = new ReentrantLock();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -28,7 +28,7 @@ public class FileLogger implements LoggerBase {
 	public void logError(String error) {
 		try {
 			lock.lock();
-			logWriter.write("ERROR:" + error);
+			logWriter.write("ERROR:" + error + "\n");
 			logWriter.flush();
 		} catch (IOException ioe) {
 
@@ -41,7 +41,7 @@ public class FileLogger implements LoggerBase {
 	public void logInfo(String info) {
 		try {
 			lock.lock();
-			logWriter.write("INFO:" + info);
+			logWriter.write("INFO:" + info + "\n");
 			logWriter.flush();
 		} catch (IOException ioe) {
 
@@ -53,7 +53,7 @@ public class FileLogger implements LoggerBase {
 	public void logWarning(String warning) {
 		try {
 			lock.lock();
-			logWriter.write("WARNING:" + warning);
+			logWriter.write("WARNING:" + warning + "\n");
 			logWriter.flush();
 		} catch (IOException ioe) {
 
@@ -65,7 +65,7 @@ public class FileLogger implements LoggerBase {
 	public void logDebug(String debug) {
 		try {
 			lock.lock();
-			logWriter.write("DEBUG:" + debug);
+			logWriter.write("DEBUG:" + debug + "\n");
 			logWriter.flush();
 		} catch (IOException ioe) {
 
