@@ -38,8 +38,13 @@ class LoggingTask implements Callable<String> {
 	@Override
 	public String call() throws Exception {
 		System.out.println("Inside call of " + name);
-		for (int ii = 0; ii <= 15000; ii++) {
-			LoggerSystem.logmessage("The " + level + " Message " + ii + " from " + name, level);
+		for (int ii = 0; ii <= 1000000; ii++) {
+			try {
+				LoggerSystem.logmessage("The " + level + " Message " + ii + " from " + name, level);
+				Thread.sleep(10);
+			} catch (InterruptedException ie) {
+
+			}
 		}
 		return "Done";
 	}

@@ -1,15 +1,22 @@
 package com.mathew.corejava.designs.logging;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Timer;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class FileLogger implements LoggerBase {
+	
+	String pattern = "yyyy-MM-dd HH:mm:ss";
+	SimpleDateFormat format = new SimpleDateFormat(pattern);
 
 	BufferedWriter logWriter;
 	ReentrantLock lock;
@@ -18,7 +25,10 @@ public class FileLogger implements LoggerBase {
 	public FileLogger(String file) {
 		fileName = file;
 		lock = new ReentrantLock();
-		createFile();		
+		createFile();
+		FileRollOverTask task = new FileRollOverTask(this);
+		Timer timer = new Timer("FileRollOverTask", true);
+		timer.scheduleAtFixedRate(task, 0, 1000);
 	}
 
 	public void createFile() {
@@ -34,7 +44,7 @@ public class FileLogger implements LoggerBase {
 	public void logError(String error) {
 		try {
 			lock.lock();
-			logWriter.write("ERROR:" + error + "\n");
+			logWriter.write(format.format(new Date())+"ERROR:" + error + "\n");
 			logWriter.flush();
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
@@ -47,7 +57,7 @@ public class FileLogger implements LoggerBase {
 	public void logInfo(String info) {
 		try {
 			lock.lock();
-			logWriter.write("INFO:" + info + "\n");
+			logWriter.write(format.format(new Date())+"INFO:" + info + "\n");
 			logWriter.flush();
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
@@ -59,7 +69,7 @@ public class FileLogger implements LoggerBase {
 	public void logWarning(String warning) {
 		try {
 			lock.lock();
-			logWriter.write("WARNING:" + warning + "\n");
+			logWriter.write(format.format(new Date())+"WARNING:" + warning + "\n");
 			logWriter.flush();
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
@@ -71,7 +81,7 @@ public class FileLogger implements LoggerBase {
 	public void logDebug(String debug) {
 		try {
 			lock.lock();
-			logWriter.write("DEBUG:" + debug + "\n");
+			logWriter.write(format.format(new Date())+"DEBUG:" + debug + "\n");
 			logWriter.flush();
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
@@ -79,23 +89,33 @@ public class FileLogger implements LoggerBase {
 			lock.unlock();
 		}
 	}
-
 	public void rolloverFile() {
-		Path pathTofile = Paths.get(fileName);
-		long sizeinBytes = pathTofile.toFile().length();
-		long kbs = sizeinBytes / 1024;
-		if (kbs >= 100) {
-			System.out.println("File size reached 100 KB");
-			synchronized (this) {
-				String newfilename = "logfile" + System.currentTimeMillis() / 1000 + ".txt";
-				Path newpathTofile = Paths.get(newfilename);
-				pathTofile.toFile().renameTo(newpathTofile.toFile());
-				pathTofile.toFile().delete();
-				System.out.println("Done rolloverFile ");
-				logWriter = null;
-				createFile();
+		try {
+			File file = Paths.get(fileName).toFile();
+			long sizeBytes = file.length();
+			long kbs = sizeBytes / 1024;
+			if (kbs > 1000) {
+				String pattern1 = "yyyy-MM-dd HH:mm:ss";
+				SimpleDateFormat format1 = new SimpleDateFormat(pattern1);
+				String fileappend = format1.format(new Date());
+				System.out.println("file append"+fileappend);
+				synchronized (this) {
+					File newfile = new File(fileName + System.currentTimeMillis()/1000 + ".txt");
+					file.renameTo(newfile);
+					// writer.close();
+					file = null;
+					// writer = null;
+					System.out.println("inside rolloverFile");
+					createFile();
+				}
 			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
+	}	
+	public static void main(String[] args) {
+		String pattern = "yyyy-MM-dd HH:mm:ss";
+		SimpleDateFormat format = new SimpleDateFormat(pattern);
+		System.out.println(format.format(new Date()));
 	}
-
 }
