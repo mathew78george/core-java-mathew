@@ -1,24 +1,35 @@
 package com.mathew.corejava.general;
 
 import java.util.HashMap;
+import java.util.Hashtable;
 
 public class TestHashCollission {
-	public static void main1(String[] args) {
+	public static void main(String[] args) {
 		HashMap<Integer, String> map = new HashMap<Integer, String>();
 		map.put(new Integer(1),"ONE");
-		map.put(new Integer(1),"TWO");
-		map.put(new Integer(1),"THREE");
-		map.put(new Integer(1),"FOUR");
-		map.put(new Integer(1),"FIVE");
+		map.put(new Integer(2),"TWO");
+		map.put(new Integer(3),"THREE");
+		map.put(new Integer(4),"FOUR");
+		map.put(new Integer(5),"FIVE");
+		map.put(null,"FIVE2121");
 		
 		System.out.println("Value = "+map.get(new Integer(1)));
 		System.out.println("Value = "+map.get(new Integer(1)));
 		System.out.println("Value = "+map.get(new Integer(1)));
 		System.out.println("Value = "+map.get(new Integer(1)));
 		System.out.println("Value = "+map.get(new Integer(1)));
+		System.out.println("Value = "+map.get(null));
+		int index = 118 & 15;
+		System.out.println(index);
+		Hashtable<String, String> HT = new Hashtable<String, String>();
+		HT.put("ONE", "tetete");
+		HT.put("two", "tetete");
+		HT.put("three", "tetete");
+		HT.put("four", "tetete");
+		System.out.println("sasasasasasasasasa");
 		
 	}
-	public static void main(String[] args) {
+	public static void main1(String[] args) {
 		HashMap<Person, String> map = new HashMap<Person, String>();
 		Person p1 = new Person(1, "ABC");
 		Person p2 = new Person(2, "DEF");
