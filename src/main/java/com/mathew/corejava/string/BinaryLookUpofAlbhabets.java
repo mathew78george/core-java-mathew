@@ -25,7 +25,19 @@ public class BinaryLookUpofAlbhabets {
 			Character key = iter.next();
 			String value = chartoBinaryMap.get(key);
 			System.out.println("key -->" + key + " Value -->" + value);
+			System.out.println(toDecimal(value));
 		}
+	}
+
+	private static int toDecimal(String binStr) {
+		int bin = Integer.parseInt(binStr);
+		int decimal = 0, count = 0;
+		while (bin != 0) {
+			decimal = decimal + (bin % 10) * (int) Math.pow(2, count);
+			count++;
+			bin = bin / 10;
+		}
+		return decimal;
 	}
 
 }

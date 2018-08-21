@@ -1,4 +1,4 @@
-package com.mathew.corejava.collection;
+package com.mathew.corejava.collections;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
