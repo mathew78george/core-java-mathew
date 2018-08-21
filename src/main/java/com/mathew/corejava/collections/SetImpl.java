@@ -1,8 +1,5 @@
 package com.mathew.corejava.collections;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class SetImpl<T> {
 
 	private SetItem<T>[] elements;
@@ -52,7 +49,7 @@ public class SetImpl<T> {
 				if (index < 0) {
 					index = index * -1;
 				}
-				SetItem anItem = newelements[index];
+				SetItem<T> anItem = newelements[index];
 				if (anItem == null) {
 					newelements[index] = item;
 				} else {
@@ -63,41 +60,6 @@ public class SetImpl<T> {
 					}
 					tail.setNext(item);
 				}
-			}
-		}
-		elements = newelements;
-	}
-
-	private synchronized void resize1() {
-		List<SetItem<T>> oldItems = new ArrayList<SetItem<T>>();
-		SetItem<T>[] oldelements = elements;
-		bucketSize = bucketSize * 2;
-		SetItem<T>[] newelements = new SetItem[bucketSize];
-		for (SetItem<T> item : oldelements) {
-			if (item != null) {
-				MySetItemIterator<T> iter = new MySetItemIterator<T>(item);
-				while (iter.hasNext()) {
-					SetItem<T> anItem = iter.next();
-					// anItem.setNext(null);
-					oldItems.add(anItem);
-				}
-			}
-		}
-		for (SetItem<T> oldItem : oldItems) {
-			int index = oldItem.getElement().hashCode() % bucketSize;
-			if (index < 0) {
-				index = index * -1;
-			}
-			SetItem<T> anItem = newelements[index];
-			if (anItem == null) {
-				newelements[index] = oldItem;
-			} else {
-				MySetItemIterator<T> iter = new MySetItemIterator<T>(anItem);
-				SetItem<T> tail = null;
-				while (iter.hasNext()) {
-					tail = iter.next();
-				}
-				tail.setNext(anItem);
 			}
 		}
 		elements = newelements;
@@ -190,8 +152,8 @@ class MySetItemIterator<T> {
 		return true;
 	}
 
-	public SetItem next() {
-		SetItem temp = currentItem;
+	public SetItem<T> next() {
+		SetItem<T> temp = currentItem;
 		currentItem = temp.getNext();
 		return temp;
 	}
