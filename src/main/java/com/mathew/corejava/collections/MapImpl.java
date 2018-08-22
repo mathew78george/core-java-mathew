@@ -1,5 +1,8 @@
 package com.mathew.corejava.collections;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class MapImpl<K, V> {
 
 	private MapItem<K, V>[] table;
@@ -26,21 +29,85 @@ public class MapImpl<K, V> {
 					mapItem.value = value;
 					return true;
 				}
+				mapItem = mapItem.getNext();
 			}
-			MapItem<K, V> newItem = new MapItem(hash, key, value, null);
+			MapItem<K, V> newItem = new MapItem<K, V>(hash, key, value, null);
 			anItem.next = newItem;
 		}
 		count++;
 		return true;
 	}
-	
+
+	public V get(K key) {
+		int hash = key.hashCode();
+		int index = hash % bucketSize;
+		MapItem<K, V> anItem = table[index];
+		if (anItem == null) {
+			return null;
+		}
+		MapItem<K, V> mapItem = anItem;
+		while (mapItem != null) {
+			if (mapItem.hash == key.hashCode() && mapItem.key.equals(key)) {
+				return mapItem.value;
+			}
+			mapItem = mapItem.getNext();
+		}
+		return null;
+	}
+
+	public boolean remove(K key) {
+		int hash = key.hashCode();
+		int index = hash % bucketSize;
+		MapItem<K, V> head = table[index];
+		if (head == null) {
+			return false;
+		}
+		MapItem<K, V> previous = null;
+		while (head != null) {
+			if (head.hash == key.hashCode() && head.key.equals(key)) {
+				break;
+			}
+			previous = head;
+			head = head.getNext();
+		}
+		if (previous == null) {
+			table[index] = previous;
+		} else {
+			previous.next = head.next;
+		}
+		return true;
+	}
+
+	public Set<K> keySet() {
+		Set<K> keys = new HashSet<K>();
+		for (int ii = 0; ii < bucketSize; ii++) {
+			MapItem<K, V> mapItem = table[ii];
+			while (mapItem != null) {
+				keys.add(mapItem.key);
+				mapItem = mapItem.getNext();
+			}
+		}
+		return keys;
+	}
+
+	public Set<V> valueSet() {
+		Set<V> values = new HashSet<V>();
+		for (int ii = 0; ii < bucketSize; ii++) {
+			MapItem<K, V> mapItem = table[ii];
+			while (mapItem != null) {
+				values.add(mapItem.value);
+				mapItem = mapItem.getNext();
+			}
+		}
+		return values;
+	}
+
 	public static void main(String[] args) {
-		MapImpl <Integer, String> map = new MapImpl<Integer, String>();
+		MapImpl<Integer, String> map = new MapImpl<Integer, String>();
 		map.put(1, "ONE");
-		map.put(2, "TW0");
-		map.put(3, "THREE");
-		map.put(1, "FOUR");
-		System.out.println("Done");
+		System.out.println(map.get(1));
+		System.out.println(map.remove(1));
+		System.out.println(map.remove(1));
 	}
 
 }
