@@ -28,7 +28,7 @@ public class LinkedListImpl<E> {
 		size++;
 	}
 
-	public void remove(E data) {
+	public void remove1(E data) {
 		int index = 0;
 		for (LinkedListItem<E> x = head; x != null; x = x.getNext()) {
 			index++;
@@ -43,16 +43,40 @@ public class LinkedListImpl<E> {
 		current.setNext(current.getNext().getNext());
 	}
 
+	public void remove(E data) {
+		if (head == null) {
+			return;
+		}
+		if (head.getItem().equals(data)) {
+			if (size == 1) {
+				head = null;
+				tail = null;
+				size--;
+				return;
+			} else {
+				head = head.getNext();
+				size--;
+				return;
+			}
+		}
+		LinkedListItem<E> temp = head;
+		while (temp.getNext() != null && !temp.getNext().getItem().equals(data)) {
+			temp = temp.getNext();
+		}
+		temp.setNext(temp.getNext().getNext());
+
+	}
+
 	public static void main(String[] args) {
 		LinkedListImpl<String> ll = new LinkedListImpl<String>();
 		ll.add("ONE");
 		ll.add("TWO");
 		ll.add("3");
 		ll.add("4");
-		ll.remove("TWO");
-		ll.add("TWO");
 		ll.add("5");
 		ll.add("6");
+		ll.add("7");
+		ll.remove("ONE");
 
 	}
 

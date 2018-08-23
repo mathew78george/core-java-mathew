@@ -1,10 +1,7 @@
 package com.mathew.corejava.algorithms;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 public class BinarySearch {
 
