@@ -55,9 +55,9 @@ public class BubbleSort {
   }
 
   public static void main(String[] args) {
-    // int[] values = { 5, 1, 6, 2, 4, 3, 8, 6, 11, 10, 9, 21, 22, 11, 17 };
-    // int[] values = { 1, 2, 3, 4, 5, 6, 6, 8, 9, 10, 11, 11, 17, 21, 22 };
-    int[] values = { 1, 2, 3, 4, 5, 6, 6, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 };
+     int[] values = { 5, 1, 6, 2, 4, 3, 8, 6, 11, 10, 9, 21, 22, 11, 17 };
+//     int[] values = { 1, 2, 3, 4, 5, 6, 6, 8, 9, 10, 11, 11, 17, 21, 22 };
+//    int[] values = { 1, 2, 3, 4, 5, 6, 6, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 };
     doBubbleSortAscenting(values);
     System.out.println("\n");
     doBubbleSortDescenting(values);

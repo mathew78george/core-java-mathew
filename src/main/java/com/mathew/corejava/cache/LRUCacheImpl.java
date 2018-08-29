@@ -11,7 +11,7 @@ public class LRUCacheImpl {
   Hashtable<String, CachePage> cache = null;
   Stack<String> stack = null;
 
-  public LRUCacheImpl(int cSize) {
+  public LRUCacheImpl(int cSize) { 
     cacheSize = cSize;
     cache = new Hashtable<String, CachePage>(cacheSize);
     stack = new Stack<String>();
